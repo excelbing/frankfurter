@@ -91,8 +91,10 @@ async def data_post(request: Request):
     data = xlb_request.get("data", {})
     namespace = data.get("namespace", None)
 
-    if namespace != "FF.FX":
-        raise HTTPException(status_code=400, detail="invalid namespace")
+    if namespace != "ECB.FX":
+        raise HTTPException(
+            status_code=400, detail={"error": {"message": "invalid namespace"}}
+        )
 
     # parse relevant keys
     payload = data.get("payload", None)
@@ -109,6 +111,9 @@ async def data_post(request: Request):
         data = get_fx(to[0]["value"], start_date.date(), end_date.date())
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"{e}") from e
+        raise HTTPException(
+            status_code=400,
+            detail={"error": {"message": "unable to process", "detail": "{e}"}},
+        ) from e
 
     return {"data": df_to_xlb(data)}
