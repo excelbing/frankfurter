@@ -113,7 +113,7 @@ async def data_post(request: Request):
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail={"error": {"message": "unable to process", "detail": "{e}"}},
+            detail={"error": {"message": "unable to process", "detail": f"{e}"}},
         ) from e
 
     return {"data": df_to_xlb(data)}
