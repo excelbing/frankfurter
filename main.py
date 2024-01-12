@@ -93,7 +93,7 @@ async def data_post(request: Request):
 
     if namespace != "ECB.FX":
         raise HTTPException(
-            status_code=400, detail={"error": {"message": "invalid namespace"}}
+            status_code=400, {"error": {"message": "invalid namespace"}}
         )
 
     # parse relevant keys
@@ -113,7 +113,7 @@ async def data_post(request: Request):
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail={"error": {"message": "unable to process", "detail": f"{e}"}},
+            {"error": {"message": "unable to process", "detail": f"{e}"}},
         ) from e
 
     return {"data": df_to_xlb(data)}
