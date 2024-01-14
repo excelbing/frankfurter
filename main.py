@@ -106,8 +106,8 @@ async def data_post(request: Request, response: Response):
         return {"error": {"message": "invalid input"}}
 
     try:
-        start_date = datetime.strptime(start_date[0]["value"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        end_date = datetime.strptime(end_date[0]["value"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        start_date = datetime.strptime(start_date[0]["value"], "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime(end_date[0]["value"], "%Y-%m-%d %H:%M:%S")
         data = get_fx(to[0]["value"], start_date.date(), end_date.date())
 
     except Exception as e:
