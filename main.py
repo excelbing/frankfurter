@@ -1,7 +1,7 @@
 """load from frankfurter api"""
 from collections import defaultdict
 from datetime import date, datetime
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request, Response
 import requests
 import pandas as pd
 import numpy as np
@@ -51,7 +51,7 @@ async def data_get(request: Request):
 
 
 @app.post("/xlb/data")
-async def data_post(request: Request):
+async def data_post(request: Request, response: Response):
     """process the Excel Bing request
 
     Notes
@@ -92,9 +92,8 @@ async def data_post(request: Request):
     namespace = data.get("namespace", None)
 
     if namespace != "ECB.FX":
-        raise HTTPException(
-            status_code=400, {"error": {"message": "invalid namespace"}}
-        )
+        response.status_code = 400
+        return {"error": {"message": "invalid namespace"}}
 
     # parse relevant keys
     payload = data.get("payload", None)
@@ -103,7 +102,8 @@ async def data_post(request: Request):
     end_date = payload.get("end_date", None)
 
     if to is None or start_date is None or end_date is None:
-        raise HTTPException(status_code=400, detail="invalid input")
+        response.status_code = 400
+        return {"error": {"message": "invalid input"}}
 
     try:
         start_date = datetime.strptime(start_date[0]["value"], "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -111,9 +111,7 @@ async def data_post(request: Request):
         data = get_fx(to[0]["value"], start_date.date(), end_date.date())
 
     except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            {"error": {"message": "unable to process", "detail": f"{e}"}},
-        ) from e
+        response.status_code = 400
+        return {"error": {"message": "unable to process", "detail": f"{e}"}}
 
     return {"data": df_to_xlb(data)}
